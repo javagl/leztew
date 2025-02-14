@@ -1,2 +1,4 @@
 # leztew
-Generating JSON from AsciiDoc
+
+Experiments for generating JSON from specific AsciiDoc files.
+
