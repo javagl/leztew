@@ -33,7 +33,7 @@ import java.util.List;
  * A plain old Java object ("bean") representing the description of a "node"
  * that was extracted from the specification.
  * 
- * This is only used for serialization to JSON.
+ * This is mainly used for serialization to JSON.
  */
 @SuppressWarnings("javadoc")
 public class NodeDescription
@@ -54,6 +54,56 @@ public class NodeDescription
     private List<SocketDescription> outputValueSockets =
         new ArrayList<SocketDescription>();
 
+    public NodeDescription() 
+    {
+        // Default constructor
+    }
+
+    public NodeDescription(String title, String name, String description,
+        List<ConfigurationElementDescription> configuration,
+        List<SocketDescription> inputFlowSockets,
+        List<SocketDescription> inputValueSockets,
+        List<SocketDescription> outputFlowSockets,
+        List<SocketDescription> outputValueSockets)
+    {
+        this.title = title;
+        this.name = name;
+        this.description = description;
+        this.configuration = configuration;
+        this.inputFlowSockets = inputFlowSockets;
+        this.inputValueSockets = inputValueSockets;
+        this.outputFlowSockets = outputFlowSockets;
+        this.outputValueSockets = outputValueSockets;
+    }
+
+    public NodeDescription(NodeDescription that)
+    {
+        this.title = that.title;
+        this.name = that.name;
+        this.description = that.description;
+        for (ConfigurationElementDescription e : that.getConfiguration())
+        {
+            this.configuration.add(new ConfigurationElementDescription(e));
+        }
+        for (SocketDescription e : that.getInputFlowSockets())
+        {
+            this.inputFlowSockets.add(new SocketDescription(e));
+        }
+        for (SocketDescription e : that.getInputValueSockets())
+        {
+            this.inputValueSockets.add(new SocketDescription(e));
+        }
+        for (SocketDescription e : that.getOutputFlowSockets())
+        {
+            this.outputFlowSockets.add(new SocketDescription(e));
+        }
+        for (SocketDescription e : that.getOutputValueSockets())
+        {
+            this.outputValueSockets.add(new SocketDescription(e));
+        }
+    }
+    
+    
     public String getTitle()
     {
         return title;

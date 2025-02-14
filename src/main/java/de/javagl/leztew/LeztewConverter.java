@@ -29,9 +29,13 @@ package de.javagl.leztew;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -228,9 +232,192 @@ public class LeztewConverter extends AbstractConverter<Object>
                 processOperationTable(table, title);
             if (nodeDescription != null)
             {
-                list.add(nodeDescription);
+                // list.add(nodeDescription);
+
+                List<NodeDescription> instances = spreadTypes(nodeDescription);
+
+                if (instances.size() > 1)
+                {
+                    logger.info("Created " + instances.size()
+                        + " instances for all types of "
+                        + nodeDescription.getName());
+                }
+
+                list.addAll(instances);
             }
         }
+    }
+
+    /**
+     * Spread out all type instantiations of the given node description.
+     * 
+     * If any input- or output value socket of the given description contains a
+     * type like <code>floatN</code> or <code>float{2|3}</code>, then the
+     * respective instantiations of node descriptions will be returned.
+     * 
+     * Otherwise, a list containing only the given node description is returned.
+     * 
+     * @param nodeDescription The node description
+     * @return The instantiations
+     */
+    private static List<NodeDescription>
+        spreadTypes(NodeDescription nodeDescription)
+    {
+        List<NodeDescription> result = new ArrayList<NodeDescription>();
+
+        // When there are no templated types, just return the
+        // given node description
+        Set<String> allTemplateValues =
+            collectTypeTemplateValues(nodeDescription);
+        if (allTemplateValues.isEmpty())
+        {
+            result.add(nodeDescription);
+            return result;
+        }
+
+        // Otherwise, return one node description for each template
+        // value, with the socket type that contained a template
+        // being replaced by the respective value
+        for (String templateValue : allTemplateValues)
+        {
+            NodeDescription instance = new NodeDescription(nodeDescription);
+            List<SocketDescription> inputValues =
+                instance.getInputValueSockets();
+            for (SocketDescription s : inputValues)
+            {
+                String type = s.getType();
+                List<String> templateValues = getTypeTemplateValues(type);
+                if (templateValues != null)
+                {
+                    s.setType(templateValue);
+                }
+            }
+            List<SocketDescription> outputValues =
+                instance.getOutputValueSockets();
+            for (SocketDescription s : outputValues)
+            {
+                String type = s.getType();
+                List<String> templateValues = getTypeTemplateValues(type);
+                if (templateValues != null)
+                {
+                    s.setType(templateValue);
+                }
+            }
+            result.add(instance);
+        }
+        return result;
+    }
+
+    /**
+     * Collect all types that are described by the "templates" in the given node
+     * description.
+     * 
+     * If any input- or output value socket of the given description contains a
+     * type like <code>floatN</code> or <code>float{2|3}</code>, then the
+     * respective instantiation of these types will be returned.
+     * 
+     * Otherwise, an empty set is returned.
+     * 
+     * @param nodeDescription The node description
+     * @return The type template values
+     */
+    private static Set<String>
+        collectTypeTemplateValues(NodeDescription nodeDescription)
+    {
+        Set<String> allTemplateValues = new LinkedHashSet<String>();
+
+        List<SocketDescription> inputValues =
+            nodeDescription.getInputValueSockets();
+        for (SocketDescription s : inputValues)
+        {
+            String type = s.getType();
+            List<String> templateValues = getTypeTemplateValues(type);
+            if (templateValues != null)
+            {
+                if (allTemplateValues.isEmpty())
+                {
+                    allTemplateValues.addAll(templateValues);
+                }
+                else
+                {
+                    Set<String> newTemplateValues =
+                        new LinkedHashSet<String>(templateValues);
+                    if (!allTemplateValues.equals(newTemplateValues))
+                    {
+                        logger.warning("Inconsistent templating: Found "
+                            + allTemplateValues + " and " + newTemplateValues);
+                    }
+                }
+            }
+        }
+        List<SocketDescription> outputValues =
+            nodeDescription.getOutputValueSockets();
+        for (SocketDescription s : outputValues)
+        {
+            String type = s.getType();
+            List<String> templateValues = getTypeTemplateValues(type);
+            if (templateValues != null)
+            {
+                if (allTemplateValues.isEmpty())
+                {
+                    allTemplateValues.addAll(templateValues);
+                }
+                else
+                {
+                    Set<String> newTemplateValues =
+                        new LinkedHashSet<String>(templateValues);
+                    if (!allTemplateValues.equals(newTemplateValues))
+                    {
+                        logger.warning("Inconsistent templating: Found "
+                            + allTemplateValues + " and " + newTemplateValues);
+                    }
+                }
+            }
+        }
+        return allTemplateValues;
+    }
+
+    /**
+     * Returns the template values for the given type.
+     * 
+     * If the type is of the form <code>typeN</code>, then this will return
+     * <code>type, type2, type3, type3, type2x2, type3x3, type4x4</code>.
+     * 
+     * Otherwise, if the type is of the form <code>type{X|Y...}</code>, then
+     * <code>typeX, typeY ... </code> will be returned.
+     * 
+     * Otherwise, <code>null</code> is returned.
+     * 
+     * @param type The type
+     * @return The template values
+     */
+    private static List<String> getTypeTemplateValues(String type)
+    {
+        if (type == null)
+        {
+            return null;
+        }
+        if (type.endsWith("N"))
+        {
+            String base = type.substring(0, type.length() - 1);
+            return Arrays.asList(base, base + "2", base + "3", base + "4",
+                base + "2x2", base + "3x3", base + "4x4");
+        }
+        int i0 = type.lastIndexOf("{");
+        int i1 = type.lastIndexOf("}");
+        if (i0 == -1 | i1 == -1)
+        {
+            return null;
+        }
+        String base = type.substring(0, i0);
+        String values = type.substring(i0 + 1, i1);
+        String[] tokens = values.split("\\|");
+        List<String> result = new ArrayList<String>();
+        for (String token : tokens)
+        {
+            result.add(base + token);
+        }
+        return result;
     }
 
     /**
@@ -263,14 +450,15 @@ public class LeztewConverter extends AbstractConverter<Object>
             // The first row should always have "Operation", "name",
             // "description".
             //
-            // Otherwise, when a row starts with "Configuration", 
-            // "Input flow sockets", "Input value sockets", 
-            // "Output flow sockets", or "Output value sockets", then it may 
-            // be followed by several other rows that all define them, 
+            // Otherwise, when a row starts with "Configuration",
+            // "Input flow sockets", "Input value sockets",
+            // "Output flow sockets", or "Output value sockets", then it may
+            // be followed by several other rows that all define them,
             // depending on the row span of the first column
             if (cells.get(0).getSource().equals("Operation"))
             {
-                nodeDescription.setName(cells.get(1).getSource());
+                String name = stripBackticks(cells.get(1).getSource());
+                nodeDescription.setName(name);
                 nodeDescription.setDescription(cells.get(2).getSource());
                 i++;
             }
@@ -353,7 +541,20 @@ public class LeztewConverter extends AbstractConverter<Object>
             }
             ConfigurationElementDescription s =
                 new ConfigurationElementDescription();
-            s.setName(cells.get(i0).getSource());
+            String source = cells.get(i0).getSource();
+            String declaration = stripBackticks(source);
+            String type = parseType(declaration);
+            String name = parseName(declaration);
+            if (type != null && name != null)
+            {
+                s.setType(type);
+                s.setName(name);
+            }
+            else
+            {
+                logger.warning("Could not extract type and name from \""
+                    + declaration + "\"");
+            }
             s.setDescription(cells.get(i1).getSource());
             configuration.add(s);
             if (j < n - 1)
@@ -393,7 +594,20 @@ public class LeztewConverter extends AbstractConverter<Object>
                 i1++;
             }
             SocketDescription s = new SocketDescription();
-            s.setName(cells.get(i0).getSource());
+            String source = cells.get(i0).getSource();
+            String declaration = stripBackticks(source);
+            String type = parseType(declaration);
+            String name = parseName(declaration);
+            if (type != null && name != null)
+            {
+                s.setType(type);
+                s.setName(name);
+            }
+            else
+            {
+                // Flow sockets don't have a type
+                s.setName(declaration);
+            }
             s.setDescription(cells.get(i1).getSource());
             socketDescriptions.add(s);
             if (j < n - 1)
@@ -468,6 +682,61 @@ public class LeztewConverter extends AbstractConverter<Object>
             }
         }
         return list;
+    }
+
+    /**
+     * Try to parse what would likely be a type declaration in the given string:
+     * If it consists of two whitespace-separated tokens, then the first token
+     * is returned. Otherwise, <code>null</code> is returned.
+     * 
+     * @param s The string
+     * @return The type
+     */
+    private static String parseType(String s)
+    {
+        StringTokenizer st = new StringTokenizer(s);
+        if (st.countTokens() == 2)
+        {
+            return st.nextToken();
+        }
+        return null;
+    }
+
+    /**
+     * Try to parse what would likely be a name in the given string: If it
+     * consists of two whitespace-separated tokens, then the first token is
+     * returned. Otherwise, <code>null</code> is returned.
+     * 
+     * @param s The string
+     * @return The name
+     */
+    private static String parseName(String s)
+    {
+        StringTokenizer st = new StringTokenizer(s);
+        if (st.countTokens() == 2)
+        {
+            st.nextToken();
+            return st.nextToken();
+        }
+        return null;
+    }
+
+    /**
+     * If the given string starts and ends with backticks (omitting leading and
+     * trailing whitespace), then the part in the backticks will be returned
+     * (omitting leading and trailing whitespace)
+     * 
+     * @param input The input string
+     * @return The result
+     */
+    private static String stripBackticks(String input)
+    {
+        String s = input.trim();
+        if (s.startsWith("`") && s.endsWith("`"))
+        {
+            s = s.substring(1, s.length() - 1).trim();
+        }
+        return s;
     }
 
 }

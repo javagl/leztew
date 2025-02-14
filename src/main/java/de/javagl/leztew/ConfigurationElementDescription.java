@@ -31,14 +31,45 @@ package de.javagl.leztew;
  * element of the "Configuration" of a node that was extracted from 
  * the specification.
  * 
- * This is only used for serialization to JSON.
+ * This is mainly used for serialization to JSON.
  */
 @SuppressWarnings("javadoc")
 public class ConfigurationElementDescription
 {
+    private String type;
     private String name;
     private String description;
 
+    public ConfigurationElementDescription() 
+    {
+        // Default constructor
+    }
+
+    public ConfigurationElementDescription(String type, String name,
+        String description)
+    {
+        this.type = type;
+        this.name = name;
+        this.description = description;
+    }
+    
+    public ConfigurationElementDescription(ConfigurationElementDescription that)
+    {
+        this.type = that.type;
+        this.name = that.name;
+        this.description = that.description;
+    }
+    
+    public String getType()
+    {
+        return type;
+    }
+
+    public void setType(String type)
+    {
+        this.type = type;
+    }
+    
     public String getName()
     {
         return name;
