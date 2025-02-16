@@ -29,8 +29,6 @@ package de.javagl.leztew;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.List;
-import java.util.Map;
 
 import org.asciidoctor.Asciidoctor;
 import org.asciidoctor.Options;
@@ -58,9 +56,13 @@ public class LeztewMain
         File inputFile = new File("./data/Specification.adoc");
         File outputFile = new File("./data/nodes.json");
 
-        Map<String, Map<String, List<NodeDescription>>> nodeDescriptions =
-            read(inputFile);
+        Category nodeDescriptions = read(inputFile);
         write(nodeDescriptions, outputFile);
+        
+        File outputFileSpread = new File("./data/nodes-spread.json");
+        Category nodeDescriptionsSpread = Categories.spreadTypes(nodeDescriptions);
+        write(nodeDescriptionsSpread, outputFileSpread);
+        
     }
 
     /**
@@ -70,8 +72,7 @@ public class LeztewMain
      * @return The {@link NodeDescription} objects
      * @throws IOException If an IO error occurs
      */
-    private static Map<String, Map<String, List<NodeDescription>>>
-        read(File file) throws IOException
+    private static Category read(File file) throws IOException
     {
         String content = new String(Files.readAllBytes(file.toPath()));
 
@@ -80,8 +81,7 @@ public class LeztewMain
         Options options = Options.builder().backend("ast-json").build();
         LeztewConverter leztewConverter =
             asciidoctor.convert(content, options, LeztewConverter.class);
-        Map<String, Map<String, List<NodeDescription>>> nodeDescriptions =
-            leztewConverter.getNodeDescriptions();
+        Category nodeDescriptions = leztewConverter.getNodeDescriptions();
         return nodeDescriptions;
     }
 
@@ -92,9 +92,8 @@ public class LeztewMain
      * @param file The file
      * @throws IOException If an IO error occurs
      */
-    private static void write(
-        Map<String, Map<String, List<NodeDescription>>> nodeDescriptions,
-        File file) throws IOException
+    private static void write(Category nodeDescriptions, File file)
+        throws IOException
     {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);

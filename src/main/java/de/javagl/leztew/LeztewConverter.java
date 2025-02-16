@@ -29,12 +29,8 @@ package de.javagl.leztew;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -56,6 +52,12 @@ import org.asciidoctor.converter.AbstractConverter;
 public class LeztewConverter extends AbstractConverter<Object>
 {
     /**
+     * The logger used in this class
+     */
+    private static final Logger logger =
+        Logger.getLogger(LeztewConverter.class.getName());
+
+    /**
      * The (0-based) section number of the "Functional Specification"
      */
     private static final int FUNCTIONAL_SPECIFICATION_SECTION_NUMBER = 3;
@@ -67,12 +69,6 @@ public class LeztewConverter extends AbstractConverter<Object>
     private static final int NODES_SECTION_NUMBER = 0;
 
     /**
-     * The logger used in this class
-     */
-    private static final Logger logger =
-        Logger.getLogger(LeztewConverter.class.getName());
-
-    /**
      * The default log level
      */
     private final Level level = Level.FINE;
@@ -82,7 +78,7 @@ public class LeztewConverter extends AbstractConverter<Object>
      * lists of {@link NodeDescription} objects that have been found in the
      * respective section.
      */
-    private final Map<String, Map<String, List<NodeDescription>>> nodeDescriptions;
+    private final Category nodeDescriptions;
 
     /**
      * Default constructor
@@ -93,18 +89,15 @@ public class LeztewConverter extends AbstractConverter<Object>
     public LeztewConverter(String backend, Map<String, Object> opts)
     {
         super(backend, opts);
-        this.nodeDescriptions =
-            new LinkedHashMap<String, Map<String, List<NodeDescription>>>();
+        this.nodeDescriptions = new Category("Nodes");
     }
 
     /**
-     * Returns a reference to the mapping that maps section names to mappings
-     * from subsection names to the list of {@link NodeDescription} objects that
-     * have been found in the sections.
+     * Returns a reference to the root {@link Category} of nodes
      * 
-     * @return The {@link NodeDescription} objects
+     * @return The {@link Category} object
      */
-    public Map<String, Map<String, List<NodeDescription>>> getNodeDescriptions()
+    public Category getNodeDescriptions()
     {
         return nodeDescriptions;
     }
@@ -167,14 +160,13 @@ public class LeztewConverter extends AbstractConverter<Object>
 
         String title = nodesSubSection.getTitle();
 
-        Map<String, List<NodeDescription>> map =
-            this.nodeDescriptions.computeIfAbsent(title,
-                t -> new LinkedHashMap<String, List<NodeDescription>>());
+        Category childCategory = new Category(title);
+        nodeDescriptions.addChild(childCategory);
 
         List<Section> sections = findSections(nodesSubSection);
         for (Section section : sections)
         {
-            processNodesCategorySection(section, map);
+            processNodesGroupSection(section, childCategory);
         }
     }
 
@@ -182,26 +174,25 @@ public class LeztewConverter extends AbstractConverter<Object>
      * Process a subsection of a nodes subsection, like "4.1.1.2. Arithmetic
      * Nodes"
      * 
-     * @param nodesCategorySection The section
-     * @param map This will store the mapping from the section title to the list
-     *        of {@link NodeDescription} objects that have been created
+     * @param nodesGroupSection The section
+     * @param category This will store the {@link NodeDescription} objects that
+     *        have been created
      */
-    private void processNodesCategorySection(Section nodesCategorySection,
-        Map<String, List<NodeDescription>> map)
+    private void processNodesGroupSection(Section nodesGroupSection,
+        Category category)
     {
         logger.log(level,
-            "Processing nodes category section "
-                + nodesCategorySection.getTitle() + " at level "
-                + nodesCategorySection.getLevel());
+            "Processing nodes group section " + nodesGroupSection.getTitle()
+                + " at level " + nodesGroupSection.getLevel());
 
-        String title = nodesCategorySection.getTitle();
-        List<NodeDescription> list =
-            map.computeIfAbsent(title, t -> new ArrayList<NodeDescription>());
+        String title = nodesGroupSection.getTitle();
+        Category childCategory = new Category(title);
+        category.addChild(childCategory);
 
-        List<Section> sections = findSections(nodesCategorySection);
+        List<Section> sections = findSections(nodesGroupSection);
         for (Section section : sections)
         {
-            processNodesDefinitionsSection(section, list);
+            processNodesDefinitionsSection(section, childCategory);
         }
     }
 
@@ -213,10 +204,11 @@ public class LeztewConverter extends AbstractConverter<Object>
      * {@link #processOperationTable(Table, String)}.
      * 
      * @param nodesDefinitionsSection The section
-     * @param list This will store the resulting {@link NodeDescription}
+     * @param category This will store the {@link NodeDescription} objects that
+     *        have been created
      */
     private void processNodesDefinitionsSection(Section nodesDefinitionsSection,
-        List<NodeDescription> list)
+        Category category)
     {
         logger.log(Level.INFO,
             "Processing nodes definitions section "
@@ -232,193 +224,11 @@ public class LeztewConverter extends AbstractConverter<Object>
                 processOperationTable(table, title);
             if (nodeDescription != null)
             {
-                // list.add(nodeDescription);
-
-                List<NodeDescription> instances = spreadTypes(nodeDescription);
-
-                if (instances.size() > 1)
-                {
-                    logger.info("Created " + instances.size()
-                        + " instances for all types of "
-                        + nodeDescription.getName());
-                }
-
-                list.addAll(instances);
+                category.addNodeDescription(nodeDescription);
             }
         }
     }
 
-    /**
-     * Spread out all type instantiations of the given node description.
-     * 
-     * If any input- or output value socket of the given description contains a
-     * type like <code>floatN</code> or <code>float{2|3}</code>, then the
-     * respective instantiations of node descriptions will be returned.
-     * 
-     * Otherwise, a list containing only the given node description is returned.
-     * 
-     * @param nodeDescription The node description
-     * @return The instantiations
-     */
-    private static List<NodeDescription>
-        spreadTypes(NodeDescription nodeDescription)
-    {
-        List<NodeDescription> result = new ArrayList<NodeDescription>();
-
-        // When there are no templated types, just return the
-        // given node description
-        Set<String> allTemplateValues =
-            collectTypeTemplateValues(nodeDescription);
-        if (allTemplateValues.isEmpty())
-        {
-            result.add(nodeDescription);
-            return result;
-        }
-
-        // Otherwise, return one node description for each template
-        // value, with the socket type that contained a template
-        // being replaced by the respective value
-        for (String templateValue : allTemplateValues)
-        {
-            NodeDescription instance = new NodeDescription(nodeDescription);
-            List<SocketDescription> inputValues =
-                instance.getInputValueSockets();
-            for (SocketDescription s : inputValues)
-            {
-                String type = s.getType();
-                List<String> templateValues = getTypeTemplateValues(type);
-                if (templateValues != null)
-                {
-                    s.setType(templateValue);
-                }
-            }
-            List<SocketDescription> outputValues =
-                instance.getOutputValueSockets();
-            for (SocketDescription s : outputValues)
-            {
-                String type = s.getType();
-                List<String> templateValues = getTypeTemplateValues(type);
-                if (templateValues != null)
-                {
-                    s.setType(templateValue);
-                }
-            }
-            result.add(instance);
-        }
-        return result;
-    }
-
-    /**
-     * Collect all types that are described by the "templates" in the given node
-     * description.
-     * 
-     * If any input- or output value socket of the given description contains a
-     * type like <code>floatN</code> or <code>float{2|3}</code>, then the
-     * respective instantiation of these types will be returned.
-     * 
-     * Otherwise, an empty set is returned.
-     * 
-     * @param nodeDescription The node description
-     * @return The type template values
-     */
-    private static Set<String>
-        collectTypeTemplateValues(NodeDescription nodeDescription)
-    {
-        Set<String> allTemplateValues = new LinkedHashSet<String>();
-
-        List<SocketDescription> inputValues =
-            nodeDescription.getInputValueSockets();
-        for (SocketDescription s : inputValues)
-        {
-            String type = s.getType();
-            List<String> templateValues = getTypeTemplateValues(type);
-            if (templateValues != null)
-            {
-                if (allTemplateValues.isEmpty())
-                {
-                    allTemplateValues.addAll(templateValues);
-                }
-                else
-                {
-                    Set<String> newTemplateValues =
-                        new LinkedHashSet<String>(templateValues);
-                    if (!allTemplateValues.equals(newTemplateValues))
-                    {
-                        logger.warning("Inconsistent templating: Found "
-                            + allTemplateValues + " and " + newTemplateValues);
-                    }
-                }
-            }
-        }
-        List<SocketDescription> outputValues =
-            nodeDescription.getOutputValueSockets();
-        for (SocketDescription s : outputValues)
-        {
-            String type = s.getType();
-            List<String> templateValues = getTypeTemplateValues(type);
-            if (templateValues != null)
-            {
-                if (allTemplateValues.isEmpty())
-                {
-                    allTemplateValues.addAll(templateValues);
-                }
-                else
-                {
-                    Set<String> newTemplateValues =
-                        new LinkedHashSet<String>(templateValues);
-                    if (!allTemplateValues.equals(newTemplateValues))
-                    {
-                        logger.warning("Inconsistent templating: Found "
-                            + allTemplateValues + " and " + newTemplateValues);
-                    }
-                }
-            }
-        }
-        return allTemplateValues;
-    }
-
-    /**
-     * Returns the template values for the given type.
-     * 
-     * If the type is of the form <code>typeN</code>, then this will return
-     * <code>type, type2, type3, type3, type2x2, type3x3, type4x4</code>.
-     * 
-     * Otherwise, if the type is of the form <code>type{X|Y...}</code>, then
-     * <code>typeX, typeY ... </code> will be returned.
-     * 
-     * Otherwise, <code>null</code> is returned.
-     * 
-     * @param type The type
-     * @return The template values
-     */
-    private static List<String> getTypeTemplateValues(String type)
-    {
-        if (type == null)
-        {
-            return null;
-        }
-        if (type.endsWith("N"))
-        {
-            String base = type.substring(0, type.length() - 1);
-            return Arrays.asList(base, base + "2", base + "3", base + "4",
-                base + "2x2", base + "3x3", base + "4x4");
-        }
-        int i0 = type.lastIndexOf("{");
-        int i1 = type.lastIndexOf("}");
-        if (i0 == -1 | i1 == -1)
-        {
-            return null;
-        }
-        String base = type.substring(0, i0);
-        String values = type.substring(i0 + 1, i1);
-        String[] tokens = values.split("\\|");
-        List<String> result = new ArrayList<String>();
-        for (String token : tokens)
-        {
-            result.add(base + token);
-        }
-        return result;
-    }
 
     /**
      * Process a single table that was found for a node definition, like that in
