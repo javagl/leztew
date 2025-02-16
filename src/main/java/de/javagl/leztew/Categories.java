@@ -46,22 +46,22 @@ public class Categories
         Category resultCategory = new Category();
         resultCategory.setName(category.getName());
 
-        List<NodeDescription> resultNodeDescriptions =
-            new ArrayList<NodeDescription>();
-        List<NodeDescription> nodeDescriptions = category.getNodeDescriptions();
-        for (NodeDescription nodeDescription : nodeDescriptions)
+        List<Node> resultNodes =
+            new ArrayList<Node>();
+        List<Node> nodes = category.getNodes();
+        for (Node node : nodes)
         {
-            List<NodeDescription> instances =
-                NodeDescriptions.spreadTypes(nodeDescription);
+            List<Node> instances =
+                Nodes.spreadTypes(node);
             if (instances.size() > 1)
             {
                 logger.info("Created " + instances.size()
                     + " instances for all types of "
-                    + nodeDescription.getName());
+                    + node.getName());
             }
-            resultNodeDescriptions.addAll(instances);
+            resultNodes.addAll(instances);
         }
-        resultCategory.setNodeDescriptions(resultNodeDescriptions);
+        resultCategory.setNodes(resultNodes);
 
         for (Category child : category.getChildren())
         {

@@ -30,41 +30,41 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A plain old Java object ("bean") representing the description of a "node"
+ * A plain old Java object ("bean") representing "node"
  * that was extracted from the specification.
  * 
  * This is mainly used for serialization to JSON.
  */
 @SuppressWarnings("javadoc")
-public class NodeDescription
+public class Node
 {
     private String title;
     private String name;
     private String description;
 
-    private List<ConfigurationElementDescription> configuration =
-        new ArrayList<ConfigurationElementDescription>();
+    private List<ConfigurationElement> configuration =
+        new ArrayList<ConfigurationElement>();
 
-    private List<SocketDescription> inputFlowSockets =
-        new ArrayList<SocketDescription>();
-    private List<SocketDescription> inputValueSockets =
-        new ArrayList<SocketDescription>();
-    private List<SocketDescription> outputFlowSockets =
-        new ArrayList<SocketDescription>();
-    private List<SocketDescription> outputValueSockets =
-        new ArrayList<SocketDescription>();
+    private List<Socket> inputFlowSockets =
+        new ArrayList<Socket>();
+    private List<Socket> inputValueSockets =
+        new ArrayList<Socket>();
+    private List<Socket> outputFlowSockets =
+        new ArrayList<Socket>();
+    private List<Socket> outputValueSockets =
+        new ArrayList<Socket>();
 
-    public NodeDescription() 
+    public Node() 
     {
         // Default constructor
     }
 
-    public NodeDescription(String title, String name, String description,
-        List<ConfigurationElementDescription> configuration,
-        List<SocketDescription> inputFlowSockets,
-        List<SocketDescription> inputValueSockets,
-        List<SocketDescription> outputFlowSockets,
-        List<SocketDescription> outputValueSockets)
+    public Node(String title, String name, String description,
+        List<ConfigurationElement> configuration,
+        List<Socket> inputFlowSockets,
+        List<Socket> inputValueSockets,
+        List<Socket> outputFlowSockets,
+        List<Socket> outputValueSockets)
     {
         this.title = title;
         this.name = name;
@@ -76,30 +76,30 @@ public class NodeDescription
         this.outputValueSockets = outputValueSockets;
     }
 
-    public NodeDescription(NodeDescription that)
+    public Node(Node that)
     {
         this.title = that.title;
         this.name = that.name;
         this.description = that.description;
-        for (ConfigurationElementDescription e : that.getConfiguration())
+        for (ConfigurationElement e : that.getConfiguration())
         {
-            this.configuration.add(new ConfigurationElementDescription(e));
+            this.configuration.add(new ConfigurationElement(e));
         }
-        for (SocketDescription e : that.getInputFlowSockets())
+        for (Socket e : that.getInputFlowSockets())
         {
-            this.inputFlowSockets.add(new SocketDescription(e));
+            this.inputFlowSockets.add(new Socket(e));
         }
-        for (SocketDescription e : that.getInputValueSockets())
+        for (Socket e : that.getInputValueSockets())
         {
-            this.inputValueSockets.add(new SocketDescription(e));
+            this.inputValueSockets.add(new Socket(e));
         }
-        for (SocketDescription e : that.getOutputFlowSockets())
+        for (Socket e : that.getOutputFlowSockets())
         {
-            this.outputFlowSockets.add(new SocketDescription(e));
+            this.outputFlowSockets.add(new Socket(e));
         }
-        for (SocketDescription e : that.getOutputValueSockets())
+        for (Socket e : that.getOutputValueSockets())
         {
-            this.outputValueSockets.add(new SocketDescription(e));
+            this.outputValueSockets.add(new Socket(e));
         }
     }
     
@@ -134,54 +134,54 @@ public class NodeDescription
         this.description = description;
     }
 
-    public List<ConfigurationElementDescription> getConfiguration()
+    public List<ConfigurationElement> getConfiguration()
     {
         return configuration;
     }
 
     public void setConfiguration(
-        List<ConfigurationElementDescription> configuration)
+        List<ConfigurationElement> configuration)
     {
         this.configuration = configuration;
     }
 
-    public List<SocketDescription> getInputFlowSockets()
+    public List<Socket> getInputFlowSockets()
     {
         return inputFlowSockets;
     }
 
-    public void setInputFlowSockets(List<SocketDescription> inputFlowSockets)
+    public void setInputFlowSockets(List<Socket> inputFlowSockets)
     {
         this.inputFlowSockets = inputFlowSockets;
     }
 
-    public List<SocketDescription> getInputValueSockets()
+    public List<Socket> getInputValueSockets()
     {
         return inputValueSockets;
     }
 
-    public void setInputValueSockets(List<SocketDescription> inputValueSockets)
+    public void setInputValueSockets(List<Socket> inputValueSockets)
     {
         this.inputValueSockets = inputValueSockets;
     }
 
-    public List<SocketDescription> getOutputFlowSockets()
+    public List<Socket> getOutputFlowSockets()
     {
         return outputFlowSockets;
     }
 
-    public void setOutputFlowSockets(List<SocketDescription> outputFlowSockets)
+    public void setOutputFlowSockets(List<Socket> outputFlowSockets)
     {
         this.outputFlowSockets = outputFlowSockets;
     }
 
-    public List<SocketDescription> getOutputValueSockets()
+    public List<Socket> getOutputValueSockets()
     {
         return outputValueSockets;
     }
 
     public void
-        setOutputValueSockets(List<SocketDescription> outputValueSockets)
+        setOutputValueSockets(List<Socket> outputValueSockets)
     {
         this.outputValueSockets = outputValueSockets;
     }
@@ -189,7 +189,7 @@ public class NodeDescription
     @Override
     public String toString()
     {
-        return "NodeDescription [title=" + title + ", name=" + name
+        return "Node [title=" + title + ", name=" + name
             + ", description=" + description + ", configuration="
             + configuration + ", inputFlowSockets=" + inputFlowSockets
             + ", inputValueSockets=" + inputValueSockets

@@ -34,52 +34,52 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 /**
- * Utility methods related to {@link NodeDescription} objects
+ * Utility methods related to {@link Node} objects
  */
-class NodeDescriptions
+class Nodes
 {
     /**
      * The logger used in this class
      */
     private static final Logger logger =
-        Logger.getLogger(NodeDescriptions.class.getName());
+        Logger.getLogger(Nodes.class.getName());
     
     /**
-     * Spread out all type instantiations of the given node description.
+     * Spread out all type instantiations of the given node.
      * 
-     * If any input- or output value socket of the given description contains a
+     * If any input- or output value socket of the given node contains a
      * type like <code>floatN</code> or <code>float{2|3}</code>, then the
-     * respective instantiations of node descriptions will be returned.
+     * respective instantiations of nodes will be returned.
      * 
-     * Otherwise, a list containing only the given node description is returned.
+     * Otherwise, a list containing only the given node is returned.
      * 
-     * @param nodeDescription The node description
+     * @param node The node 
      * @return The instantiations
      */
-    static List<NodeDescription>
-        spreadTypes(NodeDescription nodeDescription)
+    static List<Node>
+        spreadTypes(Node node)
     {
-        List<NodeDescription> result = new ArrayList<NodeDescription>();
+        List<Node> result = new ArrayList<Node>();
 
         // When there are no templated types, just return the
-        // given node description
+        // given node 
         Set<String> allTemplateValues =
-            collectTypeTemplateValues(nodeDescription);
+            collectTypeTemplateValues(node);
         if (allTemplateValues.isEmpty())
         {
-            result.add(nodeDescription);
+            result.add(node);
             return result;
         }
 
-        // Otherwise, return one node description for each template
+        // Otherwise, return one node for each template
         // value, with the socket type that contained a template
         // being replaced by the respective value
         for (String templateValue : allTemplateValues)
         {
-            NodeDescription instance = new NodeDescription(nodeDescription);
-            List<SocketDescription> inputValues =
+            Node instance = new Node(node);
+            List<Socket> inputValues =
                 instance.getInputValueSockets();
-            for (SocketDescription s : inputValues)
+            for (Socket s : inputValues)
             {
                 String type = s.getType();
                 List<String> templateValues = getTypeTemplateValues(type);
@@ -88,9 +88,9 @@ class NodeDescriptions
                     s.setType(templateValue);
                 }
             }
-            List<SocketDescription> outputValues =
+            List<Socket> outputValues =
                 instance.getOutputValueSockets();
-            for (SocketDescription s : outputValues)
+            for (Socket s : outputValues)
             {
                 String type = s.getType();
                 List<String> templateValues = getTypeTemplateValues(type);
@@ -105,26 +105,25 @@ class NodeDescriptions
     }
 
     /**
-     * Collect all types that are described by the "templates" in the given node
-     * description.
+     * Collect all types that are described by the "templates" in the given node.
      * 
-     * If any input- or output value socket of the given description contains a
+     * If any input- or output value socket of the given contains a
      * type like <code>floatN</code> or <code>float{2|3}</code>, then the
      * respective instantiation of these types will be returned.
      * 
      * Otherwise, an empty set is returned.
      * 
-     * @param nodeDescription The node description
+     * @param node The node 
      * @return The type template values
      */
     private static Set<String>
-        collectTypeTemplateValues(NodeDescription nodeDescription)
+        collectTypeTemplateValues(Node node)
     {
         Set<String> allTemplateValues = new LinkedHashSet<String>();
 
-        List<SocketDescription> inputValues =
-            nodeDescription.getInputValueSockets();
-        for (SocketDescription s : inputValues)
+        List<Socket> inputValues =
+            node.getInputValueSockets();
+        for (Socket s : inputValues)
         {
             String type = s.getType();
             List<String> templateValues = getTypeTemplateValues(type);
@@ -146,9 +145,9 @@ class NodeDescriptions
                 }
             }
         }
-        List<SocketDescription> outputValues =
-            nodeDescription.getOutputValueSockets();
-        for (SocketDescription s : outputValues)
+        List<Socket> outputValues =
+            node.getOutputValueSockets();
+        for (Socket s : outputValues)
         {
             String type = s.getType();
             List<String> templateValues = getTypeTemplateValues(type);
@@ -219,7 +218,7 @@ class NodeDescriptions
     /**
      * Private constructor to prevent instantiation
      */
-    private NodeDescriptions() 
+    private Nodes() 
     {
         // Private constructor to prevent instantiation
     }

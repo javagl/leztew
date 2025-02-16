@@ -46,7 +46,7 @@ import org.asciidoctor.converter.AbstractConverter;
 
 /**
  * Implementation of an Asciidoc Converter that receives the main content nodes,
- * and generates an instance of itself, containing the {@link NodeDescription}
+ * and generates an instance of itself, containing the {@link Node}
  * objects that have been extracted from the content.
  */
 public class LeztewConverter extends AbstractConverter<Object>
@@ -74,11 +74,9 @@ public class LeztewConverter extends AbstractConverter<Object>
     private final Level level = Level.FINE;
 
     /**
-     * The mapping from section names to the mappings of subsection names to the
-     * lists of {@link NodeDescription} objects that have been found in the
-     * respective section.
+     * The category of {@link Node} objects that have been found
      */
-    private final Category nodeDescriptions;
+    private final Category nodes;
 
     /**
      * Default constructor
@@ -89,7 +87,7 @@ public class LeztewConverter extends AbstractConverter<Object>
     public LeztewConverter(String backend, Map<String, Object> opts)
     {
         super(backend, opts);
-        this.nodeDescriptions = new Category("Nodes");
+        this.nodes = new Category("Nodes");
     }
 
     /**
@@ -97,9 +95,9 @@ public class LeztewConverter extends AbstractConverter<Object>
      * 
      * @return The {@link Category} object
      */
-    public Category getNodeDescriptions()
+    public Category getNodes()
     {
-        return nodeDescriptions;
+        return nodes;
     }
 
     @Override
@@ -161,7 +159,7 @@ public class LeztewConverter extends AbstractConverter<Object>
         String title = nodesSubSection.getTitle();
 
         Category childCategory = new Category(title);
-        nodeDescriptions.addChild(childCategory);
+        nodes.addChild(childCategory);
 
         List<Section> sections = findSections(nodesSubSection);
         for (Section section : sections)
@@ -175,7 +173,7 @@ public class LeztewConverter extends AbstractConverter<Object>
      * Nodes"
      * 
      * @param nodesGroupSection The section
-     * @param category This will store the {@link NodeDescription} objects that
+     * @param category This will store the {@link Node} objects that
      *        have been created
      */
     private void processNodesGroupSection(Section nodesGroupSection,
@@ -204,7 +202,7 @@ public class LeztewConverter extends AbstractConverter<Object>
      * {@link #processOperationTable(Table, String)}.
      * 
      * @param nodesDefinitionsSection The section
-     * @param category This will store the {@link NodeDescription} objects that
+     * @param category This will store the {@link Node} objects that
      *        have been created
      */
     private void processNodesDefinitionsSection(Section nodesDefinitionsSection,
@@ -220,11 +218,11 @@ public class LeztewConverter extends AbstractConverter<Object>
         List<Table> tables = findAll(blocks, Table.class);
         for (Table table : tables)
         {
-            NodeDescription nodeDescription =
+            Node node =
                 processOperationTable(table, title);
-            if (nodeDescription != null)
+            if (node != null)
             {
-                category.addNodeDescription(nodeDescription);
+                category.addNode(node);
             }
         }
     }
@@ -235,11 +233,11 @@ public class LeztewConverter extends AbstractConverter<Object>
      * "4.1.1.2.10. Subtraction".
      * 
      * @param table The table
-     * @param title The title for the node description
-     * @return The {@link NodeDescription}, or <code>null</code> if the table
+     * @param title The title for the node 
+     * @return The {@link Node}, or <code>null</code> if the table
      *         could not be parsed.
      */
-    private NodeDescription processOperationTable(Table table, String title)
+    private Node processOperationTable(Table table, String title)
     {
         logger.log(level, "Table " + table);
         List<Row> body = table.getBody();
@@ -250,7 +248,7 @@ public class LeztewConverter extends AbstractConverter<Object>
             return null;
         }
 
-        NodeDescription nodeDescription = new NodeDescription();
+        Node node = new Node();
         int i = 0;
         while (i < body.size())
         {
@@ -268,43 +266,43 @@ public class LeztewConverter extends AbstractConverter<Object>
             if (cells.get(0).getSource().equals("Operation"))
             {
                 String name = stripBackticks(cells.get(1).getSource());
-                nodeDescription.setName(name);
-                nodeDescription.setDescription(cells.get(2).getSource());
+                node.setName(name);
+                node.setDescription(cells.get(2).getSource());
                 i++;
             }
             else if (cells.get(0).getSource().equals("Configuration"))
             {
                 int n = Math.max(cells.get(0).getRowspan(), 1);
-                processConfigurationDescriptions(body, i,
-                    nodeDescription.getConfiguration());
+                processConfiguration(body, i,
+                    node.getConfiguration());
                 i += n;
             }
             else if (cells.get(0).getSource().equals("Input flow sockets"))
             {
                 int n = Math.max(cells.get(0).getRowspan(), 1);
-                processSocketDescriptions(body, i,
-                    nodeDescription.getInputFlowSockets());
+                processSockets(body, i,
+                    node.getInputFlowSockets());
                 i += n;
             }
             else if (cells.get(0).getSource().equals("Input value sockets"))
             {
                 int n = Math.max(cells.get(0).getRowspan(), 1);
-                processSocketDescriptions(body, i,
-                    nodeDescription.getInputValueSockets());
+                processSockets(body, i,
+                    node.getInputValueSockets());
                 i += n;
             }
             else if (cells.get(0).getSource().equals("Output flow sockets"))
             {
                 int n = Math.max(cells.get(0).getRowspan(), 1);
-                processSocketDescriptions(body, i,
-                    nodeDescription.getOutputFlowSockets());
+                processSockets(body, i,
+                    node.getOutputFlowSockets());
                 i += n;
             }
             else if (cells.get(0).getSource().equals("Output value sockets"))
             {
                 int n = Math.max(cells.get(0).getRowspan(), 1);
-                processSocketDescriptions(body, i,
-                    nodeDescription.getOutputValueSockets());
+                processSockets(body, i,
+                    node.getOutputValueSockets());
                 i += n;
             }
             else
@@ -316,23 +314,21 @@ public class LeztewConverter extends AbstractConverter<Object>
 
         }
 
-        logger.log(level, "Final nodeDescription " + nodeDescription);
-        nodeDescription.setTitle(title);
-        return nodeDescription;
+        logger.log(level, "Final node " + node);
+        node.setTitle(title);
+        return node;
 
     }
 
     /**
-     * Process the configuration descriptions from the given table body
+     * Process the configuration from the given table body
      * 
      * @param body The table body
      * @param startRow The row where to start reading the configuration
-     *        descriptions
      * @param configuration The list that will store the resulting configuration
-     *        descriptions.
      */
-    private void processConfigurationDescriptions(List<Row> body, int startRow,
-        List<ConfigurationElementDescription> configuration)
+    private void processConfiguration(List<Row> body, int startRow,
+        List<ConfigurationElement> configuration)
     {
         int r = startRow;
         Row row = body.get(r);
@@ -349,8 +345,8 @@ public class LeztewConverter extends AbstractConverter<Object>
                 i0++;
                 i1++;
             }
-            ConfigurationElementDescription s =
-                new ConfigurationElementDescription();
+            ConfigurationElement s =
+                new ConfigurationElement();
             String source = cells.get(i0).getSource();
             String declaration = stripBackticks(source);
             String type = parseType(declaration);
@@ -377,15 +373,14 @@ public class LeztewConverter extends AbstractConverter<Object>
     }
 
     /**
-     * Process the socket descriptions from the given table body
+     * Process the sockets from the given table body
      * 
      * @param body The table body
-     * @param startRow The row where to start reading the socket descriptions
-     * @param socketDescriptions The list that will store the resulting socket
-     *        descriptions.
+     * @param startRow The row where to start reading the sockets
+     * @param sockets The list that will store the resulting sockets.
      */
-    private void processSocketDescriptions(List<Row> body, int startRow,
-        List<SocketDescription> socketDescriptions)
+    private void processSockets(List<Row> body, int startRow,
+        List<Socket> sockets)
     {
         int r = startRow;
         Row row = body.get(r);
@@ -403,7 +398,7 @@ public class LeztewConverter extends AbstractConverter<Object>
                 i0++;
                 i1++;
             }
-            SocketDescription s = new SocketDescription();
+            Socket s = new Socket();
             String source = cells.get(i0).getSource();
             String declaration = stripBackticks(source);
             String type = parseType(declaration);
@@ -419,7 +414,7 @@ public class LeztewConverter extends AbstractConverter<Object>
                 s.setName(declaration);
             }
             s.setDescription(cells.get(i1).getSource());
-            socketDescriptions.add(s);
+            sockets.add(s);
             if (j < n - 1)
             {
                 r++;

@@ -27,33 +27,31 @@
 package de.javagl.leztew;
 
 /**
- * A plain old Java object ("bean") representing the description of an
- * element of the "Configuration" of a node that was extracted from 
- * the specification.
+ * A plain old Java object ("bean") representing a "socket"
+ * that was extracted from the specification.
  * 
  * This is mainly used for serialization to JSON.
  */
 @SuppressWarnings("javadoc")
-public class ConfigurationElementDescription
+public class Socket
 {
     private String type;
     private String name;
     private String description;
 
-    public ConfigurationElementDescription() 
+    public Socket() 
     {
         // Default constructor
     }
 
-    public ConfigurationElementDescription(String type, String name,
-        String description)
+    public Socket(String type, String name, String description)
     {
         this.type = type;
         this.name = name;
         this.description = description;
     }
     
-    public ConfigurationElementDescription(ConfigurationElementDescription that)
+    public Socket(Socket that)
     {
         this.type = that.type;
         this.name = that.name;
@@ -69,7 +67,7 @@ public class ConfigurationElementDescription
     {
         this.type = type;
     }
-    
+
     public String getName()
     {
         return name;
@@ -93,8 +91,8 @@ public class ConfigurationElementDescription
     @Override
     public String toString()
     {
-        return "ConfigurationElementDescription [name=" + getName() + ", description="
-            + getDescription() + "]";
+        return "Socket [type=" + getType() + ", name=" + getName()
+            + ", description=" + getDescription() + "]";
     }
 
 }

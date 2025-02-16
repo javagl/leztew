@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A plain old Java object ("bean") representing a category of node descriptions
+ * A plain old Java object ("bean") representing a category of nodes
  * 
  * This is mainly used for serialization to JSON.
  */
@@ -38,8 +38,8 @@ import java.util.List;
 public class Category
 {
     private String name;
-    private List<NodeDescription> nodeDescriptions =
-        new ArrayList<NodeDescription>();
+    private List<Node> nodes =
+        new ArrayList<Node>();
     private List<Category> children = new ArrayList<Category>();
 
     public Category()
@@ -52,20 +52,20 @@ public class Category
         this.name = name;
     }
 
-    public Category(String name, List<NodeDescription> nodeDescriptions,
+    public Category(String name, List<Node> nodes,
         List<Category> children)
     {
         this.name = name;
-        this.nodeDescriptions = nodeDescriptions;
+        this.nodes = nodes;
         this.children = children;
     }
 
     public Category(Category that)
     {
         this.name = that.name;
-        for (NodeDescription e : that.getNodeDescriptions())
+        for (Node e : that.getNodes())
         {
-            this.nodeDescriptions.add(new NodeDescription(e));
+            this.nodes.add(new Node(e));
         }
         for (Category e : that.getChildren())
         {
@@ -83,19 +83,19 @@ public class Category
         this.name = name;
     }
 
-    public List<NodeDescription> getNodeDescriptions()
+    public List<Node> getNodes()
     {
-        return nodeDescriptions;
+        return nodes;
     }
 
-    public void setNodeDescriptions(List<NodeDescription> nodeDescriptions)
+    public void setNodes(List<Node> nodes)
     {
-        this.nodeDescriptions = nodeDescriptions;
+        this.nodes = nodes;
     }
 
-    public void addNodeDescription(NodeDescription nodeDescription)
+    public void addNode(Node node)
     {
-        this.nodeDescriptions.add(nodeDescription);
+        this.nodes.add(node);
     }
 
     public List<Category> getChildren()
@@ -116,8 +116,8 @@ public class Category
     @Override
     public String toString()
     {
-        return "Category [name=" + name + ", nodeDescriptions="
-            + nodeDescriptions + ", children=" + children.size() + "]";
+        return "Category [name=" + name + ", nodes="
+            + nodes + ", children=" + children.size() + "]";
     }
     
 }

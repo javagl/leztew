@@ -56,20 +56,20 @@ public class LeztewMain
         File inputFile = new File("./data/Specification.adoc");
         File outputFile = new File("./data/nodes.json");
 
-        Category nodeDescriptions = read(inputFile);
-        write(nodeDescriptions, outputFile);
+        Category nodes = read(inputFile);
+        write(nodes, outputFile);
         
         File outputFileSpread = new File("./data/nodes-spread.json");
-        Category nodeDescriptionsSpread = Categories.spreadTypes(nodeDescriptions);
-        write(nodeDescriptionsSpread, outputFileSpread);
+        Category nodesSpread = Categories.spreadTypes(nodes);
+        write(nodesSpread, outputFileSpread);
         
     }
 
     /**
-     * Read the {@link NodeDescription} objects from the given file
+     * Read the {@link Node} objects from the given file
      * 
      * @param file The file
-     * @return The {@link NodeDescription} objects
+     * @return The {@link Node} objects
      * @throws IOException If an IO error occurs
      */
     private static Category read(File file) throws IOException
@@ -81,23 +81,23 @@ public class LeztewMain
         Options options = Options.builder().backend("ast-json").build();
         LeztewConverter leztewConverter =
             asciidoctor.convert(content, options, LeztewConverter.class);
-        Category nodeDescriptions = leztewConverter.getNodeDescriptions();
-        return nodeDescriptions;
+        Category nodes = leztewConverter.getNodes();
+        return nodes;
     }
 
     /**
-     * Write the given {@link NodeDescription} objects to the given file
+     * Write the given {@link Node} objects to the given file
      * 
-     * @param nodeDescriptions The {@link NodeDescription} objects
+     * @param nodes The {@link Node} objects
      * @param file The file
      * @throws IOException If an IO error occurs
      */
-    private static void write(Category nodeDescriptions, File file)
+    private static void write(Category nodes, File file)
         throws IOException
     {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
         objectMapper.setSerializationInclusion(Include.NON_EMPTY);
-        objectMapper.writeValue(file, nodeDescriptions);
+        objectMapper.writeValue(file, nodes);
     }
 }
