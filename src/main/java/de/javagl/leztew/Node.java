@@ -30,8 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A plain old Java object ("bean") representing "node"
- * that was extracted from the specification.
+ * A plain old Java object ("bean") representing "node" that was extracted from
+ * the specification.
  * 
  * This is mainly used for serialization to JSON.
  */
@@ -45,25 +45,19 @@ public class Node
     private List<ConfigurationElement> configuration =
         new ArrayList<ConfigurationElement>();
 
-    private List<Socket> inputFlowSockets =
-        new ArrayList<Socket>();
-    private List<Socket> inputValueSockets =
-        new ArrayList<Socket>();
-    private List<Socket> outputFlowSockets =
-        new ArrayList<Socket>();
-    private List<Socket> outputValueSockets =
-        new ArrayList<Socket>();
+    private List<Socket> inputFlowSockets = new ArrayList<Socket>();
+    private List<Socket> inputValueSockets = new ArrayList<Socket>();
+    private List<Socket> outputFlowSockets = new ArrayList<Socket>();
+    private List<Socket> outputValueSockets = new ArrayList<Socket>();
 
-    public Node() 
+    public Node()
     {
         // Default constructor
     }
 
     public Node(String title, String name, String description,
-        List<ConfigurationElement> configuration,
-        List<Socket> inputFlowSockets,
-        List<Socket> inputValueSockets,
-        List<Socket> outputFlowSockets,
+        List<ConfigurationElement> configuration, List<Socket> inputFlowSockets,
+        List<Socket> inputValueSockets, List<Socket> outputFlowSockets,
         List<Socket> outputValueSockets)
     {
         this.title = title;
@@ -102,8 +96,7 @@ public class Node
             this.outputValueSockets.add(new Socket(e));
         }
     }
-    
-    
+
     public String getTitle()
     {
         return title;
@@ -139,8 +132,7 @@ public class Node
         return configuration;
     }
 
-    public void setConfiguration(
-        List<ConfigurationElement> configuration)
+    public void setConfiguration(List<ConfigurationElement> configuration)
     {
         this.configuration = configuration;
     }
@@ -180,8 +172,7 @@ public class Node
         return outputValueSockets;
     }
 
-    public void
-        setOutputValueSockets(List<Socket> outputValueSockets)
+    public void setOutputValueSockets(List<Socket> outputValueSockets)
     {
         this.outputValueSockets = outputValueSockets;
     }
@@ -189,11 +180,10 @@ public class Node
     @Override
     public String toString()
     {
-        return "Node [title=" + title + ", name=" + name
-            + ", description=" + description + ", configuration="
-            + configuration + ", inputFlowSockets=" + inputFlowSockets
-            + ", inputValueSockets=" + inputValueSockets
-            + ", outputFlowSockets=" + outputFlowSockets
+        return "Node [title=" + title + ", name=" + name + ", description="
+            + description + ", configuration=" + configuration
+            + ", inputFlowSockets=" + inputFlowSockets + ", inputValueSockets="
+            + inputValueSockets + ", outputFlowSockets=" + outputFlowSockets
             + ", outputValueSockets=" + outputValueSockets + "]";
     }
 

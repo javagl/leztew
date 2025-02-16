@@ -46,8 +46,8 @@ import org.asciidoctor.converter.AbstractConverter;
 
 /**
  * Implementation of an Asciidoc Converter that receives the main content nodes,
- * and generates an instance of itself, containing the {@link Node}
- * objects that have been extracted from the content.
+ * and generates an instance of itself, containing the {@link Node} objects that
+ * have been extracted from the content.
  */
 public class LeztewConverter extends AbstractConverter<Object>
 {
@@ -173,8 +173,8 @@ public class LeztewConverter extends AbstractConverter<Object>
      * Nodes"
      * 
      * @param nodesGroupSection The section
-     * @param category This will store the {@link Node} objects that
-     *        have been created
+     * @param category This will store the {@link Node} objects that have been
+     *        created
      */
     private void processNodesGroupSection(Section nodesGroupSection,
         Category category)
@@ -202,8 +202,8 @@ public class LeztewConverter extends AbstractConverter<Object>
      * {@link #processOperationTable(Table, String)}.
      * 
      * @param nodesDefinitionsSection The section
-     * @param category This will store the {@link Node} objects that
-     *        have been created
+     * @param category This will store the {@link Node} objects that have been
+     *        created
      */
     private void processNodesDefinitionsSection(Section nodesDefinitionsSection,
         Category category)
@@ -218,8 +218,7 @@ public class LeztewConverter extends AbstractConverter<Object>
         List<Table> tables = findAll(blocks, Table.class);
         for (Table table : tables)
         {
-            Node node =
-                processOperationTable(table, title);
+            Node node = processOperationTable(table, title);
             if (node != null)
             {
                 category.addNode(node);
@@ -227,15 +226,14 @@ public class LeztewConverter extends AbstractConverter<Object>
         }
     }
 
-
     /**
      * Process a single table that was found for a node definition, like that in
      * "4.1.1.2.10. Subtraction".
      * 
      * @param table The table
-     * @param title The title for the node 
-     * @return The {@link Node}, or <code>null</code> if the table
-     *         could not be parsed.
+     * @param title The title for the node
+     * @return The {@link Node}, or <code>null</code> if the table could not be
+     *         parsed.
      */
     private Node processOperationTable(Table table, String title)
     {
@@ -273,36 +271,31 @@ public class LeztewConverter extends AbstractConverter<Object>
             else if (cells.get(0).getSource().equals("Configuration"))
             {
                 int n = Math.max(cells.get(0).getRowspan(), 1);
-                processConfiguration(body, i,
-                    node.getConfiguration());
+                processConfiguration(body, i, node.getConfiguration());
                 i += n;
             }
             else if (cells.get(0).getSource().equals("Input flow sockets"))
             {
                 int n = Math.max(cells.get(0).getRowspan(), 1);
-                processSockets(body, i,
-                    node.getInputFlowSockets());
+                processSockets(body, i, node.getInputFlowSockets());
                 i += n;
             }
             else if (cells.get(0).getSource().equals("Input value sockets"))
             {
                 int n = Math.max(cells.get(0).getRowspan(), 1);
-                processSockets(body, i,
-                    node.getInputValueSockets());
+                processSockets(body, i, node.getInputValueSockets());
                 i += n;
             }
             else if (cells.get(0).getSource().equals("Output flow sockets"))
             {
                 int n = Math.max(cells.get(0).getRowspan(), 1);
-                processSockets(body, i,
-                    node.getOutputFlowSockets());
+                processSockets(body, i, node.getOutputFlowSockets());
                 i += n;
             }
             else if (cells.get(0).getSource().equals("Output value sockets"))
             {
                 int n = Math.max(cells.get(0).getRowspan(), 1);
-                processSockets(body, i,
-                    node.getOutputValueSockets());
+                processSockets(body, i, node.getOutputValueSockets());
                 i += n;
             }
             else
@@ -345,8 +338,7 @@ public class LeztewConverter extends AbstractConverter<Object>
                 i0++;
                 i1++;
             }
-            ConfigurationElement s =
-                new ConfigurationElement();
+            ConfigurationElement s = new ConfigurationElement();
             String source = cells.get(i0).getSource();
             String declaration = stripBackticks(source);
             String type = parseType(declaration);

@@ -45,14 +45,14 @@ class LoggerUtil
      * The set of configured loggers
      */
     private static final Set<Logger> configuredLoggers = new HashSet<Logger>();
-    
+
     /**
      * Utility method to initialize the logging
      */
     public static void initLogging()
     {
         Logger logger = null;
-        
+
         logger = Logger.getLogger("");
         LoggerUtil.configureDefault(logger);
         logger.setLevel(Level.CONFIG);
@@ -66,7 +66,7 @@ class LoggerUtil
     public static void configureDefault(Logger logger)
     {
         configuredLoggers.add(logger);
-        
+
         for (Handler handler : logger.getHandlers())
         {
             logger.removeHandler(handler);
@@ -80,13 +80,13 @@ class LoggerUtil
                 String s = getFormatter().format(record);
                 System.out.println(s);
             }
-            
+
             @Override
             public void flush()
             {
                 // Nothing to do here
             }
-            
+
             @Override
             public void close() throws SecurityException
             {
@@ -94,7 +94,7 @@ class LoggerUtil
             }
         };
         logger.addHandler(handler);
-        
+
         handler.setFormatter(new Formatter()
         {
             @Override
@@ -102,16 +102,16 @@ class LoggerUtil
             {
                 String className = record.getSourceClassName();
                 String simpleName = getUnqualifiedClassName(className);
-                String level = 
+                String level =
                     String.format("%-7s", record.getLevel().toString());
-                return level+": "+simpleName+": "+record.getMessage();
+                return level + ": " + simpleName + ": " + record.getMessage();
             }
-            
+
             private String getUnqualifiedClassName(String className)
             {
-                return className.substring(className.lastIndexOf('.')+1);
+                return className.substring(className.lastIndexOf('.') + 1);
             }
-            
+
         });
     }
 

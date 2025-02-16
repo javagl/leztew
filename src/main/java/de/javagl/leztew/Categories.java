@@ -33,7 +33,7 @@ import java.util.logging.Logger;
 /**
  * Utility methods related to {@link Category} objects
  */
-public class Categories
+class Categories
 {
     /**
      * The logger used in this class
@@ -41,23 +41,30 @@ public class Categories
     private static final Logger logger =
         Logger.getLogger(Categories.class.getName());
 
+    /**
+     * Creates a new {@link Category} that is a copy of the given one, with
+     * instantiations for different node types.
+     * 
+     * Each node that defines a "template type" will be replaced by a list of
+     * node instances, one for each type.
+     * 
+     * @param category The input category
+     * @return The ouotput category
+     */
     public static Category spreadTypes(Category category)
     {
         Category resultCategory = new Category();
         resultCategory.setName(category.getName());
 
-        List<Node> resultNodes =
-            new ArrayList<Node>();
+        List<Node> resultNodes = new ArrayList<Node>();
         List<Node> nodes = category.getNodes();
         for (Node node : nodes)
         {
-            List<Node> instances =
-                Nodes.spreadTypes(node);
+            List<Node> instances = Nodes.spreadTypes(node);
             if (instances.size() > 1)
             {
                 logger.info("Created " + instances.size()
-                    + " instances for all types of "
-                    + node.getName());
+                    + " instances for all types of " + node.getName());
             }
             resultNodes.addAll(instances);
         }

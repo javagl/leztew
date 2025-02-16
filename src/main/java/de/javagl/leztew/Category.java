@@ -38,8 +38,7 @@ import java.util.List;
 public class Category
 {
     private String name;
-    private List<Node> nodes =
-        new ArrayList<Node>();
+    private List<Node> nodes = new ArrayList<Node>();
     private List<Category> children = new ArrayList<Category>();
 
     public Category()
@@ -52,8 +51,7 @@ public class Category
         this.name = name;
     }
 
-    public Category(String name, List<Node> nodes,
-        List<Category> children)
+    public Category(String name, List<Node> nodes, List<Category> children)
     {
         this.name = name;
         this.nodes = nodes;
@@ -112,12 +110,12 @@ public class Category
     {
         this.children.add(child);
     }
-    
+
     @Override
     public String toString()
     {
-        return "Category [name=" + name + ", nodes="
-            + nodes + ", children=" + children.size() + "]";
+        return "Category [name=" + name + ", nodes=" + nodes + ", children="
+            + children.size() + "]";
     }
-    
+
 }

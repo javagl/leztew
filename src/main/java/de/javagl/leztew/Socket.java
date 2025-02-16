@@ -27,8 +27,8 @@
 package de.javagl.leztew;
 
 /**
- * A plain old Java object ("bean") representing a "socket"
- * that was extracted from the specification.
+ * A plain old Java object ("bean") representing a "socket" that was extracted
+ * from the specification.
  * 
  * This is mainly used for serialization to JSON.
  */
@@ -39,7 +39,7 @@ public class Socket
     private String name;
     private String description;
 
-    public Socket() 
+    public Socket()
     {
         // Default constructor
     }
@@ -50,14 +50,14 @@ public class Socket
         this.name = name;
         this.description = description;
     }
-    
+
     public Socket(Socket that)
     {
         this.type = that.type;
         this.name = that.name;
         this.description = that.description;
     }
-    
+
     public String getType()
     {
         return type;

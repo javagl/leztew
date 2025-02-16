@@ -27,9 +27,8 @@
 package de.javagl.leztew;
 
 /**
- * A plain old Java object ("bean") representing an element of 
- * the "Configuration" of a node that was extracted from 
- * the specification.
+ * A plain old Java object ("bean") representing an element of the
+ * "Configuration" of a node that was extracted from the specification.
  * 
  * This is mainly used for serialization to JSON.
  */
@@ -40,26 +39,25 @@ public class ConfigurationElement
     private String name;
     private String description;
 
-    public ConfigurationElement() 
+    public ConfigurationElement()
     {
         // Default constructor
     }
 
-    public ConfigurationElement(String type, String name,
-        String description)
+    public ConfigurationElement(String type, String name, String description)
     {
         this.type = type;
         this.name = name;
         this.description = description;
     }
-    
+
     public ConfigurationElement(ConfigurationElement that)
     {
         this.type = that.type;
         this.name = that.name;
         this.description = that.description;
     }
-    
+
     public String getType()
     {
         return type;
@@ -69,7 +67,7 @@ public class ConfigurationElement
     {
         this.type = type;
     }
-    
+
     public String getName()
     {
         return name;

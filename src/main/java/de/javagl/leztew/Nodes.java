@@ -43,28 +43,26 @@ class Nodes
      */
     private static final Logger logger =
         Logger.getLogger(Nodes.class.getName());
-    
+
     /**
      * Spread out all type instantiations of the given node.
      * 
-     * If any input- or output value socket of the given node contains a
-     * type like <code>floatN</code> or <code>float{2|3}</code>, then the
-     * respective instantiations of nodes will be returned.
+     * If any input- or output value socket of the given node contains a type
+     * like <code>floatN</code> or <code>float{2|3}</code>, then the respective
+     * instantiations of nodes will be returned.
      * 
      * Otherwise, a list containing only the given node is returned.
      * 
-     * @param node The node 
+     * @param node The node
      * @return The instantiations
      */
-    static List<Node>
-        spreadTypes(Node node)
+    static List<Node> spreadTypes(Node node)
     {
         List<Node> result = new ArrayList<Node>();
 
         // When there are no templated types, just return the
-        // given node 
-        Set<String> allTemplateValues =
-            collectTypeTemplateValues(node);
+        // given node
+        Set<String> allTemplateValues = collectTypeTemplateValues(node);
         if (allTemplateValues.isEmpty())
         {
             result.add(node);
@@ -77,8 +75,7 @@ class Nodes
         for (String templateValue : allTemplateValues)
         {
             Node instance = new Node(node);
-            List<Socket> inputValues =
-                instance.getInputValueSockets();
+            List<Socket> inputValues = instance.getInputValueSockets();
             for (Socket s : inputValues)
             {
                 String type = s.getType();
@@ -88,8 +85,7 @@ class Nodes
                     s.setType(templateValue);
                 }
             }
-            List<Socket> outputValues =
-                instance.getOutputValueSockets();
+            List<Socket> outputValues = instance.getOutputValueSockets();
             for (Socket s : outputValues)
             {
                 String type = s.getType();
@@ -105,24 +101,23 @@ class Nodes
     }
 
     /**
-     * Collect all types that are described by the "templates" in the given node.
+     * Collect all types that are described by the "templates" in the given
+     * node.
      * 
-     * If any input- or output value socket of the given contains a
-     * type like <code>floatN</code> or <code>float{2|3}</code>, then the
-     * respective instantiation of these types will be returned.
+     * If any input- or output value socket of the given contains a type like
+     * <code>floatN</code> or <code>float{2|3}</code>, then the respective
+     * instantiation of these types will be returned.
      * 
      * Otherwise, an empty set is returned.
      * 
-     * @param node The node 
+     * @param node The node
      * @return The type template values
      */
-    private static Set<String>
-        collectTypeTemplateValues(Node node)
+    private static Set<String> collectTypeTemplateValues(Node node)
     {
         Set<String> allTemplateValues = new LinkedHashSet<String>();
 
-        List<Socket> inputValues =
-            node.getInputValueSockets();
+        List<Socket> inputValues = node.getInputValueSockets();
         for (Socket s : inputValues)
         {
             String type = s.getType();
@@ -145,8 +140,7 @@ class Nodes
                 }
             }
         }
-        List<Socket> outputValues =
-            node.getOutputValueSockets();
+        List<Socket> outputValues = node.getOutputValueSockets();
         for (Socket s : outputValues)
         {
             String type = s.getType();
@@ -218,7 +212,7 @@ class Nodes
     /**
      * Private constructor to prevent instantiation
      */
-    private Nodes() 
+    private Nodes()
     {
         // Private constructor to prevent instantiation
     }

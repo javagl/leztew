@@ -58,11 +58,11 @@ public class LeztewMain
 
         Category nodes = read(inputFile);
         write(nodes, outputFile);
-        
+
         File outputFileSpread = new File("./data/nodes-spread.json");
         Category nodesSpread = Categories.spreadTypes(nodes);
         write(nodesSpread, outputFileSpread);
-        
+
     }
 
     /**
@@ -92,8 +92,7 @@ public class LeztewMain
      * @param file The file
      * @throws IOException If an IO error occurs
      */
-    private static void write(Category nodes, File file)
-        throws IOException
+    private static void write(Category nodes, File file) throws IOException
     {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
