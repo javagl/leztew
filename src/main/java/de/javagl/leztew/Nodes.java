@@ -28,8 +28,10 @@ package de.javagl.leztew;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -51,21 +53,21 @@ class Nodes
      * like <code>floatN</code> or <code>float{2|3}</code>, then the respective
      * instantiations of nodes will be returned.
      * 
-     * Otherwise, a list containing only the given node is returned.
+     * Otherwise, a mapping from the empty string to the given node is returned.
      * 
      * @param node The node
      * @return The instantiations
      */
-    static List<Node> spreadTypes(Node node)
+    static Map<String, Node> spreadTypes(Node node)
     {
-        List<Node> result = new ArrayList<Node>();
+        Map<String, Node> result = new LinkedHashMap<String, Node>();
 
         // When there are no templated types, just return the
         // given node
         Set<String> allTemplateValues = collectTypeTemplateValues(node);
         if (allTemplateValues.isEmpty())
         {
-            result.add(node);
+            result.put("", node);
             return result;
         }
 
@@ -95,7 +97,7 @@ class Nodes
                     s.setType(templateValue);
                 }
             }
-            result.add(instance);
+            result.put(templateValue, instance);
         }
         return result;
     }
@@ -113,7 +115,7 @@ class Nodes
      * @param node The node
      * @return The type template values
      */
-    private static Set<String> collectTypeTemplateValues(Node node)
+    static Set<String> collectTypeTemplateValues(Node node)
     {
         Set<String> allTemplateValues = new LinkedHashSet<String>();
 

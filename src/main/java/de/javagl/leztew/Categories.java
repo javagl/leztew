@@ -28,6 +28,8 @@ package de.javagl.leztew;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 /**
@@ -49,9 +51,12 @@ class Categories
      * node instances, one for each type.
      * 
      * @param category The input category
-     * @return The ouotput category
+     * @param createSubCategories Whether the instances should be put into an
+     *        own category
+     * @return The output category
      */
-    public static Category spreadTypes(Category category)
+    public static Category spreadTypes(Category category,
+        boolean createSubCategories)
     {
         Category resultCategory = new Category();
         resultCategory.setName(category.getName());
@@ -60,19 +65,42 @@ class Categories
         List<Node> nodes = category.getNodes();
         for (Node node : nodes)
         {
-            List<Node> instances = Nodes.spreadTypes(node);
-            if (instances.size() > 1)
+            Map<String, Node> instances = Nodes.spreadTypes(node);
+            if (instances.size() == 1)
             {
+                resultNodes.add(node);
+            }
+            else
+            {
+
                 logger.info("Created " + instances.size()
                     + " instances for all types of " + node.getName());
+
+                if (createSubCategories)
+                {
+                    Category subCategory = new Category(node.getName());
+                    category.addChild(subCategory);
+                    for (Entry<String, Node> entry : instances.entrySet())
+                    {
+                        String templateName = entry.getKey();
+                        Node instance = entry.getValue();
+                        Node newInstance = new Node(instance);
+                        newInstance.setTitle(
+                            node.getTitle() + " (" + templateName + ")");
+                        subCategory.addNode(newInstance);
+                    }
+                }
+                else
+                {
+                    resultNodes.addAll(instances.values());
+                }
             }
-            resultNodes.addAll(instances);
         }
         resultCategory.setNodes(resultNodes);
 
         for (Category child : category.getChildren())
         {
-            Category resultChild = spreadTypes(child);
+            Category resultChild = spreadTypes(child, createSubCategories);
             resultCategory.addChild(resultChild);
         }
         return resultCategory;

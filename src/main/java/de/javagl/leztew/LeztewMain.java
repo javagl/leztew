@@ -60,7 +60,8 @@ public class LeztewMain
         write(nodes, outputFile);
 
         File outputFileSpread = new File("./data/nodes-spread.json");
-        Category nodesSpread = Categories.spreadTypes(nodes);
+        boolean createSubCategories = true;
+        Category nodesSpread = Categories.spreadTypes(nodes, createSubCategories);
         write(nodesSpread, outputFileSpread);
 
     }
