@@ -54,16 +54,18 @@ public class LeztewMain
         LoggerUtil.initLogging();
 
         File inputFile = new File("./data/Specification.adoc");
-        File outputFile = new File("./data/nodes.json");
-
         Category nodes = read(inputFile);
+
+        File outputFile = new File("./data/nodes.json");
         write(nodes, outputFile);
 
         File outputFileSpread = new File("./data/nodes-spread.json");
-        boolean createSubCategories = true;
-        Category nodesSpread = Categories.spreadTypes(nodes, createSubCategories);
+        Category nodesSpread = Categories.spreadTypes(nodes, false);
         write(nodesSpread, outputFileSpread);
 
+        File outputFileSpreadSub = new File("./data/nodes-spread-sub.json");
+        Category nodesSpreadSub = Categories.spreadTypes(nodes, true);
+        write(nodesSpreadSub, outputFileSpreadSub);
     }
 
     /**
